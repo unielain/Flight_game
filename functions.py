@@ -2,6 +2,20 @@ import random
 import mysql.connector
 from geopy import distance
 
+# game starts:
+def start_screen():
+    connection = connect_to_database()
+    sql = 'SELECT dialog from story where event="startscreen";'
+    cursor_start = connection.cursor()
+    cursor_start.execute(sql)
+    result = cursor_start.fetchall()
+    result = str(result[0])
+    dialog1 = beautify_object(result)
+
+    with open(dialog1) as dusk1:
+        dialog1 = dusk1.readlines()
+    return json.dumps(dialog1, default=lambda o: o.__dict__, indent=4)
+
 
 # connects to the db
 def connect_to_database():
