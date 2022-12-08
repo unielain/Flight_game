@@ -54,7 +54,8 @@ def store_values(value, input_type):
 # gets a starting location
 def random_location():
     connection = connect_to_database()
-    sql = "SELECT name FROM country;"
+    sql = f"SELECT latitude_deg, longitude_deg from airport where airport.iso_country in("
+    sql += "select objects.iso_country from objects);"
     cursor_location = connection.cursor()
     cursor_location.execute(sql)
     result = cursor_location.fetchall()
@@ -63,15 +64,7 @@ def random_location():
         index2 += 1
     random_index = random.randint(1, index2)
     location = result[random_index]
-    location = beautify_object(location)
-    for char in location[3:]:
-        if char.isupper():
-            index2 = location.find(char)
-            location1 = location[0:index2]
-            location2 = location[index2:]
-            location = f"{location1} {location2}"
     return location
-
 
 # finds the locations for map api
 def find_locations(degree):
