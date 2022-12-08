@@ -1,4 +1,4 @@
-import tt from '/services';
+
 console.log('start');
 
 //Startscreen
