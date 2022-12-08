@@ -4,5 +4,5 @@ CREATE TABLE weather(id int(11) auto_increment primary key, name varchar(40), ev
 CREATE TABLE reach_event(id int(11) auto_increment primary key, location varchar(11), weather_name varchar(11));
 ALTER TABLE game
 ADD COLUMN(highscore float, password varchar(40));
-ALTER TABLE inventory ADD CONSTRAINT play_id FOREIGN KEY (player_id) REFERENCES game(i) ON DELETE CASCADE;
+ALTER TABLE inventory ADD CONSTRAINT play_id FOREIGN KEY (player_id) REFERENCES game(id) ON DELETE CASCADE;
 ALTER TABLE game ALTER co2_budget SET DEFAULT 5000;
