@@ -52,3 +52,11 @@ def list_of_locations():
     items = functions.list_of_lat_long('latitude_deg', 'longitude_deg')
     return json.dumps(items, default=lambda o: o.__dict__, indent=4)
 
+
+@app.route('/random_loc')
+def rand_loc():
+    locs = functions.random_location()
+    return json.dumps(locs, default=lambda o: o.__dict__, ident=4)
+
+if __name__ == '__main__':
+   app.run(use_reloader=True, host='127.0.0.1', port=5000)
