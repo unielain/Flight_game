@@ -1,20 +1,8 @@
+import json
 import random
 import mysql.connector
 from geopy import distance
 
-# game starts:
-def start_screen():
-    connection = connect_to_database()
-    sql = 'SELECT dialog from story where event="startscreen";'
-    cursor_start = connection.cursor()
-    cursor_start.execute(sql)
-    result = cursor_start.fetchall()
-    result = str(result[0])
-    dialog1 = beautify_object(result)
-
-    with open(dialog1) as dusk1:
-        dialog1 = dusk1.readlines()
-    return json.dumps(dialog1, default=lambda o: o.__dict__, indent=4)
 
 
 # connects to the db
@@ -31,9 +19,40 @@ def connect_to_database():
     return connection
 
 
+# game starts:
+def fetch_dialog(event, chname):
+    connection = connect_to_database()
+    sql = f'SELECT dialog from story where event="{event}" AND character_name="{chname}";'
+    cursor_start = connection.cursor()
+    cursor_start.execute(sql)
+    result = cursor_start.fetchall()
+    result = str(result[0])
+    dialog1 = beautify_object(result)
+    with open(dialog1) as dusk1:
+        dialog1 = dusk1.readlines()
+    return json.dumps(dialog1, default=lambda o: o.__dict__, indent=4)
+
+
+# check if user in db already
+def check_user_name(username):
+    connection = connect_to_database()
+    sql = f"SELECT screen_name FROM game WHERE screen_name='{username}';"
+    cursor_check = connection.cursor()
+    cursor_check.execute(sql)
+    result = cursor_check.fetchall()
+    if len(result) > 0:
+        return False
+    return True
+
+
+# store values from flask
+def store_values(value, input_type):
+    values = dict()
+    values.update({input_type: value})
+    return values
+
 # gets a starting location
 def random_location():
-
     connection = connect_to_database()
     sql = "SELECT name FROM country;"
     cursor_location = connection.cursor()
@@ -54,26 +73,56 @@ def random_location():
     return location
 
 
-# check if user in db already
-def check_user_name(username):
+# finds the locations for map api
+def find_locations(degree):
     connection = connect_to_database()
-    sql = f"SELECT screen_name FROM game WHERE screen_name='{username}';"
+    sql = f"SELECT {degree} from airport where iso_country in("
+    sql += "select iso_country from objects);"
+    cursor_loc = connection.cursor()
+    cursor_loc.execute(sql)
+    result = cursor_loc.fetchall()
+    if len(result) > 0:
+        return result
+    else:
+        return False
+
+
+def list_of_lat_long(deg_lang, deg_lon):
+    lang_degrees = deg_lang
+    long_degrees = deg_lon
+    lat = []
+    long = []
+    latitudes = find_locations(lang_degrees)
+    for row in latitudes:
+        row = beautify_object(row)
+        row = float(row)
+        lat.append(row)
+    longitudes = find_locations(long_degrees)
+    for row in longitudes:
+        row = beautify_object(row)
+        float(row)
+        long.append(row)
+    result = [lat, long]
+    return result
+
+
+# checks if password exists
+def check_password(password):
+    connection = connect_to_database()
+    sql = f"SELECT id FROM game WHERE password='{password}';"
     cursor_check = connection.cursor()
     cursor_check.execute(sql)
     result = cursor_check.fetchall()
     if len(result) > 0:
-        sql = f"DELETE FROM game where screen_name='{username}';"
-        cursor_del = connection.cursor()
-        cursor_del.execute(sql)
-    return True
+        return False
 
 
 # creates user
-def create_new_user(username, location):
+def create_new_user(username, password):
+    location = random_location();
     connection = connect_to_database()
-    check_user_name(username)
-    sql = f"INSERT INTO game(Co2_consumed, co2_budget, location, screen_name) "
-    sql += f"VALUES (0, 0, '{location}', '{username}');"
+    sql = f"INSERT INTO game(location, screen_name, password) "
+    sql += f"VALUES ('{location}','{username}', '{password}');"
     cursor_create_new_user = connection.cursor()
     cursor_create_new_user.execute(sql)
     return True
@@ -284,3 +333,16 @@ def leaderboard():
     for stuff in result:
         board.append(stuff)
     return board
+
+
+# checks password
+def check_password(password):
+    connection = connect_to_database()
+    sql = f"SELECT id FROM game WHERE password='{password}';"
+    cursor_check = connection.cursor()
+    cursor_check.execute(sql)
+    result = cursor_check.fetchall()
+    if len(result) > 0:
+        return False
+
+    return True
