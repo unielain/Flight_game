@@ -30,14 +30,13 @@ def startgame():
     return result
 
 
-# continues with what was your name?
 @app.route('/screen_name')
 def get_name():
     args = request.args
     name = str(args.get('name'))
     check = functions.check_user_name(name)
     if check is True:
-        result = 'Make a new account'
+        result = functions.fetch_dialog('Newgamepassword', 'Melon_Dusk')
     else:
         result = 'Name not available'
     return result
