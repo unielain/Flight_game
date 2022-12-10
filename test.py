@@ -1,10 +1,7 @@
 from flask import Flask, request, Response
 from flask_cors import CORS
 import json
-import mysql.connector
 import functions
-
-
 
 # main
 app = Flask(__name__)
@@ -47,16 +44,27 @@ def list_of_items():
     items = functions.get_and_rand_object()
     return json.dumps(items, default=lambda o: o.__dict__, indent=4)
 
+# gets coordinates
 @app.route('/list_locations')
 def list_of_locations():
     items = functions.list_of_lat_long('latitude_deg', 'longitude_deg')
     return json.dumps(items, default=lambda o: o.__dict__, indent=4)
 
-
+# users start location
 @app.route('/random_loc')
 def rand_loc():
     locs = functions.random_location()
-    return json.dumps(locs, default=lambda o: o.__dict__, ident=4)
+    return json.dumps(locs, default=lambda o: o.__dict__, indent=4)
+
+# gets the hints for selected objects
+@app.route('/get_a_hint')
+def hints():
+    args = request.args
+    items = str(args.get('items'))
+    hint = functions.hint_country(items)
+    return json.dumps(hint, default=lambda o: o.__dict__, indent=4)
+
+# measures the location
 
 if __name__ == '__main__':
    app.run(use_reloader=True, host='127.0.0.1', port=5000)
