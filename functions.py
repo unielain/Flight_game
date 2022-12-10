@@ -66,6 +66,7 @@ def random_location():
     location = result[random_index]
     return location
 
+
 # finds the locations for map api
 def find_locations(degree):
     connection = connect_to_database()
@@ -112,13 +113,27 @@ def check_password(password):
 
 # creates user
 def create_new_user(username, password):
-    location = random_location();
+    location_deg = random_location()
+    location = get_loc_name(location_deg)
     connection = connect_to_database()
-    sql = f"INSERT INTO game(location, screen_name, password) "
-    sql += f"VALUES ('{location}','{username}', '{password}');"
+    sql = f"INSERT INTO game(location, screen_name, password, status) "
+    sql += f"VALUES ('{location}','{username}', '{password}', 1);"
     cursor_create_new_user = connection.cursor()
     cursor_create_new_user.execute(sql)
+    sql = f"UPDATE inventory SET player_id = (select id from game where screen_name = '{username}');"
+    cursor_update_inv = connection.cursor()
+    cursor_update_inv.execute(sql)
     return True
+
+def get_loc_name(degs):
+    connection = connect_to_database()
+    sql = f"select iso_country from airport where latitude_deg={degs[0]} and longitude_deg={degs[1]};"
+    cursor_get_iso = connection.cursor()
+    cursor_get_iso.execute(sql)
+    result = cursor_get_iso.fetchall()
+    result = beautify_object(result)
+    return result
+
 
 
 # gets object for player to search
@@ -151,7 +166,31 @@ def get_and_rand_object():
             objects_list.append(stuff_to_find)
         if len(objects_list) == 4:
             break
+        add_to_inv(objects_list)
     return objects_list
+
+#adds object to fetchlistdb
+
+def add_to_inv(itemlist):
+    connection = connect_to_database()
+    for row in itemlist:
+        sql = f'UPDATE objects SET status=0 WHERE name="{row}";'
+        alter_stat = connection.cursor()
+        alter_stat.execute(sql)
+    return True
+
+# gives the hints of objects
+def hint_country(items):
+    connection = connect_to_database()
+    sql = f"SELECT hint FROM objects WHERE name='{items}'"
+    hints_fetch = connection.cursor()
+    hints_fetch.execute(sql)
+    hints_get = hints_fetch.fetchall()
+    for row in hints_get:
+        hint = beautify_object(row)
+        with open(hint) as dusk1:
+            hint = dusk1.readlines()
+    return hint
 
 
 # gives the user a choice for country
