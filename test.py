@@ -64,6 +64,12 @@ def hints():
     hint = functions.hint_country(items)
     return json.dumps(hint, default=lambda o: o.__dict__, indent=4)
 
+@app.route('/stranger_advice')
+def dialog_advice():
+    result = functions.fetch_dialog('newgametutorial', 'Shady_figure')
+    result =
+    return json.dumps(result, default=lambda o:o.__dict__, indent=4)
+
 # measures the location
 
 if __name__ == '__main__':
