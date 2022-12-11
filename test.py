@@ -67,8 +67,19 @@ def hints():
 @app.route('/stranger_advice')
 def dialog_advice():
     result = functions.fetch_dialog('newgametutorial', 'Shady_figure')
-    result =
+    result = result.replace("[", "")
+    result = result.replace("\n", "")
+    result = result.replace("]", "")
+    result = result[5:-1]
     return json.dumps(result, default=lambda o:o.__dict__, indent=4)
+
+@app.route('/travel')
+def travel():
+    args = request.args
+    lat = str(args.get('lat'))
+    lon = str(args.get('lon'))
+    resp = functions.fly_to_a_country(lat, lon)
+    return json.dumps(resp, default=lambda o:o.__dict__, indent=4)
 
 # measures the location
 
