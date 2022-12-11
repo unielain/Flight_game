@@ -197,56 +197,9 @@ def hint_country(items):
     return hint
 
 
-# gives the user a choice for country
-def where_to_travel():
-    while True:
-        print("Where do you want to travel?")
-        print("Choose a continent:")
-        print("1: Europe, 2: Africa 3: North-America, 4: South-America, 5: Oceania, 6: Asia, 7: Antarctica")
-        continent = int(input("Give a number of the continent: "))
-        if continent in range(1, 8):
-            return continent
-            break
-        else:
-            print(f"Incorrect continent number! Try again.")
-
-
-def which_country(cont):
-    continents = ["EU","AF", "NA", "SA", "OC", "AS", "AN"]
-    index = cont - 1
-    for item in continents:
-        if continents[index] == item:
-                continent = item
+def fly_to_a_country(lat, lon):
     connection = connect_to_database()
-    sql = f"SELECT country.name FROM country, objects WHERE country.continent='{continent}' and country.iso_country = objects.iso_country;"
-    cursor_country = connection.cursor()
-    cursor_country.execute(sql)
-    result = cursor_country.fetchall()
-    countries = []
-    i = 1
-    for country in result:
-        option = beautify_object(country)
-        str_country = f"{i}. {option}"
-        countries.append(str_country)
-        i += 1
-    return countries
-
-
-def fly_to_a_country(country_num, countries):
-    index = country_num - 1
-    for item in countries:
-        if item == countries[index]:
-            country = item[3:]
-            for char in country[3:]:
-                if char.isupper():
-                    index = country.find(char)
-                    country1 = country[0:index]
-                    country2 = country[index:]
-                    country = f"{country1} {country2}"
-            if country[0] == " ":
-                country = country[1:]
-    connection = connect_to_database()
-    sql = f"SELECT iso_country FROM country WHERE name='{country}';"
+    sql = f"SELECT name FROM airport WHERE latitude_deg='{lat}' AND longitude_deg='{lon}';"
     cursor_country = connection.cursor()
     cursor_country.execute(sql)
     result = cursor_country.fetchall()
