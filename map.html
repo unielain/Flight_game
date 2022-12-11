@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+          integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+          crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+            integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+            crossorigin=""></script>
+    <style>
+        #map {
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map">
+    <script>
+        async function airports() {
+            try {
+
+                const response = await fetch('http://127.0.0.1:5000/list_locations');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    return data;
+                } else {
+                    const answer = 'No voi paska, ei toimi' + response.error;
+                    return answer
+                }
+            } catch (error) {
+                console.log('error');
+                return error
+            }
+        }
+
+        async function get_start_loc() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/random_loc');
+                console.log(response);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    return data;
+                } else {
+                    const answer = 'No voi paska, ei toimi' + response.error;
+                    return answer
+                }
+            } catch (error) {
+                console.log('error');
+                return error
+            }
+        }
+
+        async function main() {
+            const loc = await get_start_loc();
+            const latitude = loc[0];
+            const longitude = loc[1];
+            const elevation = loc[2]
+            const map = L.map('map').setView([latitude, longitude], elevation);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 10,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            let circle = L.circle([latitude, longitude], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 4000
+            }).addTo(map);
+            const airport = await airports();
+            const lat = airport[0]
+            const lon = airport[1]
+            for (let i = 0; i < lat.length; i++) {
+               marker = L.marker([lat[i], lon[i]]).addTo(map);
+            }
+            /*for (let i = 0; i < markers.length in markers){
+               markers.push(this["const"+"marker"+i]
+            }*/
+
+
+
+        }
+
+        main()
+
+    </script>
+</div>
+
+</body>
+</html>

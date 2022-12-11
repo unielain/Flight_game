@@ -54,7 +54,7 @@ def store_values(value, input_type):
 # gets a starting location
 def random_location():
     connection = connect_to_database()
-    sql = f"SELECT latitude_deg, longitude_deg from airport where airport.iso_country in("
+    sql = f"SELECT latitude_deg, longitude_deg, elevation_ft from airport where airport.iso_country in("
     sql += "select objects.iso_country from objects);"
     cursor_location = connection.cursor()
     cursor_location.execute(sql)
@@ -69,14 +69,20 @@ def random_location():
 
 # finds the locations for map api
 def find_locations(degree):
+    airports = []
+    iso = []
     connection = connect_to_database()
-    sql = f"SELECT {degree} from airport where iso_country in("
+    sql = f"SELECT {degree}, iso_country from airport where iso_country in("
     sql += "select iso_country from objects);"
     cursor_loc = connection.cursor()
     cursor_loc.execute(sql)
     result = cursor_loc.fetchall()
     if len(result) > 0:
-        return result
+        for row in result:
+            if row[1] not in iso:
+                airports.append(row[0])
+                iso.append(row[1])
+        return airports
     else:
         return False
 
@@ -89,12 +95,10 @@ def list_of_lat_long(deg_lang, deg_lon):
     latitudes = find_locations(lang_degrees)
     for row in latitudes:
         row = beautify_object(row)
-        row = float(row)
         lat.append(row)
     longitudes = find_locations(long_degrees)
     for row in longitudes:
         row = beautify_object(row)
-        float(row)
         long.append(row)
     result = [lat, long]
     return result

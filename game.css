@@ -1,0 +1,50 @@
+@font-face {
+    font-family: "Rubik 80s Fade", serif;
+    src: local("Rubik 80s Fade"); url("Rubik80sFade-Regular.ttf"), format("truetype");
+    font-family: "Noto Sans", Sans-Serif;
+    src: local("Noto Sans"); url("NotoSans-Regular.ttf"), format("truetype");
+}
+
+body{
+    font-family: "Noto Sans", Sans-Serif;
+}
+
+
+html {
+    background-color: #777575;
+}
+
+
+
+article {
+    background-color: #778899;
+    position: center;
+    box-sizing: content-box;
+    margin-left: 20%;
+    margin-right: 20%;
+    padding: 2px;
+}
+
+#inputs {
+    background-color: rgba(23, 22, 22, 0.3);
+    position: center;
+    box-sizing: content-box;
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+iframe {
+    height: 525px;
+    position: center;
+    float: center;
+    margin-left: 20%;
+}
+
+
+.text {
+    margin-left: 5%;
+    font-size: 70%;
+    display: inline-block;
+    vertical-align: middle;
+
+}
