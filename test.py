@@ -46,7 +46,7 @@ def getco2():
     return json.dumps(result, default=lambda o:o.__dict__, indent=4)
 
 
-# WORKING WITH THIS ONE RN, DO NOT TOUCH
+# updates co2 based on travel in map.html
 @app.route('/travel')
 def travel():
     args = request.args
@@ -58,7 +58,7 @@ def travel():
     resp = functions.fly_to_a_country(lat, lon)
     co2consumed = functions.calculate_co2(lat, lon, airport)
     functions.update_co2('sakari', co2consumed)
-    functions.change_loc('sakari', resp, name)
+    functions.change_loc(lat, lon)
     return json.dumps(resp, default=lambda o:o.__dict__, indent=4)
 
 @app.route('/check_item')
