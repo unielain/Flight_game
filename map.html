@@ -65,7 +65,7 @@
                     console.log(data);
                     return data;
                 } else {
-                    const answer = 'No voi paska, ei toimi' + response.error;
+                    const answer = 'error' + response.error;
                     return answer
                 }
             } catch (error) {
@@ -75,17 +75,16 @@
         }
 
         async function main() {
-            const loc = await get_start_loc();
+             const loc = await get_start_loc();
             let latitude = loc[0];
             let longitude = loc[1];
-            const elevation = loc[2]
-            const name = loc[3]
+            const elevation = loc[2];
             const map = L.map('map').setView([latitude, longitude], elevation);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 7,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
-            let circle = L.circle([latitude, longitude], {
+            var circleUser = L.marker([latitude, longitude], {
                 color: 'red',
                 fillColor: '#f03',
                 fillOpacity: 0.5,
@@ -93,44 +92,38 @@
             }).addTo(map);
 
 
-            circle.bindPopup("<b>Your location: </b>" + loc[3]);
-
-            async function add_marker() {
-                let markers = []
+            circleUser.bindPopup("<b>Your location: </b>" + loc[3]);
                 const airport = await airports();
                 const lat = airport[0]
                 const lon = airport[1]
                 const name = airport[2]
+                const iso = airport[3]
                 let points = []
                 for (let i = 0; i < lat.length; i++) {
                     let row = [name[i], lat[i], lon[i]];
                     points.push(row);
                 }
+
                 for (let i = 0; i < points.length; i++) {
                     var circle = L.circle([lat[i], lon[i]], {
                         color: 'blue',
                         fillColor: '#023dbe',
                         fillOpacity: 0.5,
                         radius: 4000,
-                        id: name[i]}).addTo(map).bindPopup(name[i] + '<br>' + '<button>travel</button>').on('click', async function(event){
-                            const namea = await travel(lat[i], lon[i])
-                                                        alert(namea)
+                        id: name[i]
 
-                    })
-
-                markers.push(circle);
+                    }).addTo(map).bindPopup(name[i]).on('click', async function(event){
+                            let travelOrNay = confirm('Travel to: ' + name[i])
+                        if(travelOrNay){
+                            const namea = await travel(lat[i], lon[i]);
+                            latitude = lat[i];
+                            longitude = lon[i];
+                            circleUser.setLatLng([lat[i], lon[i]]).addTo(map);
+                        }
+                    });
             }
-
-
         }
-
-        add_marker();
-
-
-        }
-
-
-        main()
+        main();
 
     </script>
 </div>
