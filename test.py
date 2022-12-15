@@ -9,34 +9,6 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content type'
 
 
-# game starts:
-@app.route('/startgame')
-def startgame():
-    result = functions.fetch_dialog('startscreen', 'Melon_Dusk')
-    return result
-
-
-@app.route('/screen_name')
-def get_name():
-    args = request.args
-    name = str(args.get('name'))
-    check = functions.check_user_name(name)
-    if check is True:
-        result = functions.fetch_dialog('newgamepassword', 'Melon_Dusk')
-    else:
-        result = functions.fetch_dialog('same_screen_name', 'Melon_Dusk')
-    return result
-
-
-@app.route('/new_password')
-def create_password():
-    args = request.args
-    password = str(args.get('password'))
-    name = str(args.get('name'))
-    result = functions.fetch_dialog('newgametutorial', 'Melon_Dusk')
-    functions.create_new_user(name, password)
-    return result
-
 
 # gets a list of the items that need fetching
 @app.route('/list_items')
@@ -44,16 +16,19 @@ def list_of_items():
     items = functions.get_and_rand_object()
     return json.dumps(items, default=lambda o: o.__dict__, indent=4)
 
+
 # gets coordinates
 @app.route('/list_locations')
 def list_of_locations():
-    items = functions.list_of_lat_long('latitude_deg', 'longitude_deg')
+    items = functions.find_locations()
     return json.dumps(items, default=lambda o: o.__dict__, indent=4)
 
 # users start location
 @app.route('/random_loc')
 def rand_loc():
     locs = functions.random_location()
+    airport = functions.airport_name(locs)
+    functions.change_loc('sakari', airport)
     return json.dumps(locs, default=lambda o: o.__dict__, indent=4)
 
 # gets the hints for selected objects
@@ -64,22 +39,33 @@ def hints():
     hint = functions.hint_country(items)
     return json.dumps(hint, default=lambda o: o.__dict__, indent=4)
 
-@app.route('/stranger_advice')
-def dialog_advice():
-    result = functions.fetch_dialog('newgametutorial', 'Shady_figure')
-    result = result.replace("[", "")
-    result = result.replace("\n", "")
-    result = result.replace("]", "")
-    result = result[5:-1]
+
+@app.route('/co2_stats')
+def getco2():
+    result = functions.getco2()
     return json.dumps(result, default=lambda o:o.__dict__, indent=4)
 
+
+# WORKING WITH THIS ONE RN, DO NOT TOUCH
 @app.route('/travel')
 def travel():
     args = request.args
-    lat = str(args.get('lat'))
-    lon = str(args.get('lon'))
+    lat = float(args.get('lat'))
+    lon = float(args.get('lon'))
+    degs = [lat, lon]
+    name = functions.airport_name(degs)
+    airport = functions.find_loc('sakari')
     resp = functions.fly_to_a_country(lat, lon)
+    co2consumed = functions.calculate_co2(lat, lon, airport)
+    functions.update_co2('sakari', co2consumed)
+    functions.change_loc('sakari', resp, name)
     return json.dumps(resp, default=lambda o:o.__dict__, indent=4)
+
+@app.route('/check_item')
+def item_checker():
+    item = functions.find_object()
+    return json.dumps(item, default=lambda o:o.__dict__, indent=4)
+
 
 # measures the location
 
