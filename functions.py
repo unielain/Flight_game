@@ -131,7 +131,7 @@ def fly_to_a_country(lat, lon):
     return result
 
 
-# WORKING WITH THIS ONE RN, DO NOT TOUCH
+# calculates co2
 def calculate_co2(lat, lon, location):
     connection = connect_to_database()
     sql = f"SELECT latitude_deg, longitude_deg FROM airport WHERE name='{location}';"
@@ -139,7 +139,7 @@ def calculate_co2(lat, lon, location):
     cursor_country.execute(sql)
     cord1 = cursor_country.fetchall()
     cord2 = [lat, lon]
-    distance_km = distance.distance(cord1[0:1], cord2[0:1]).km
+    distance_km = distance.distance(cord1[0:2], cord2[0:2]).km
     result = 3.16 * distance_km
     return result
 
